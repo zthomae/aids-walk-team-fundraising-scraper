@@ -4,7 +4,7 @@ variable "environment" {
 }
 
 locals {
-  package_path = "${path.module}/../../build/package.zip"
+  package_path = "${path.module}/../../../build/package.zip"
 }
 
 resource "aws_iam_role" "iam_for_get_standings_data_lambda" {
