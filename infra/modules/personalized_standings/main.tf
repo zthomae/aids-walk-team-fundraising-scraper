@@ -47,7 +47,7 @@ locals {
 }
 
 resource "aws_iam_role" "iam_for_get_standings_data_lambda" {
-  name = "iam_for_get_standings_data_lambda"
+  name = "${var.environment}_iam_for_get_standings_data_lambda"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -73,7 +73,7 @@ resource "aws_lambda_function" "get_standings_data_lambda_function" {
 }
 
 resource "aws_iam_policy" "get_standings_data_policies" {
-  name = "get_standings_data_policies"
+  name = "${var.environment}_get_standings_data_policies"
   description = "IAM policy for the get standings data lambda"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -113,7 +113,7 @@ resource "aws_dynamodb_table" "standings_table" {
 }
 
 resource "aws_iam_role" "iam_for_store_standings_data_lambda" {
-  name = "iam_for_store_standings_data_lambda"
+  name = "${var.environment}_iam_for_store_standings_data_lambda"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -144,7 +144,7 @@ resource "aws_lambda_function" "store_standings_data_lambda_function" {
 }
 
 resource "aws_iam_policy" "store_standings_data_policies" {
-  name = "store_standings_data_policies"
+  name = "${var.environment}_store_standings_data_policies"
   description = "IAM policy for the store standings data lambda"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -174,7 +174,7 @@ resource "aws_iam_role_policy_attachment" "store_standings_data_attachment" {
 }
 
 resource "aws_iam_role" "iam_for_personalized_standings_lambda" {
-  name = "iam_for_personalized_standings_lambda"
+  name = "${var.environment}_iam_for_personalized_standings_lambda"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -208,7 +208,7 @@ resource "aws_lambda_function" "personalized_standings_lambda_function" {
 }
 
 resource "aws_iam_policy" "personalized_standings_policies" {
-  name = "personalized_standings_policies"
+  name = "${var.environment}_personalized_standings_policies"
   description = "IAM policy for the personalized standings lambda"
   policy = jsonencode({
     Version = "2012-10-17"
@@ -248,7 +248,7 @@ resource "aws_iam_role_policy_attachment" "personalized_standings_attachment" {
 }
 
 resource "aws_iam_role" "iam_for_update_personalized_standings_state_machine" {
-  name = "iam_for_update_personalized_standings_state_machine"
+  name = "${var.environment}_iam_for_update_personalized_standings_state_machine"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -309,7 +309,7 @@ resource "aws_sfn_state_machine" "update_personalized_standings_state_machine" {
 }
 
 resource "aws_iam_role" "iam_for_update_personalized_standings_event_target" {
-  name = "iam_for_update_personalized_standings_event_target"
+  name = "${var.environment}_iam_for_update_personalized_standings_event_target"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
