@@ -16,4 +16,5 @@ provider "aws" {
 module "personalized_standings" {
   source = "../modules/personalized_standings"
   environment = var.environment
+  region = var.region
 }
