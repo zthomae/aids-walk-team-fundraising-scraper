@@ -5,16 +5,14 @@ import os
 import requests
 
 
-dynamodb = boto3.resource("dynamodb")
-scores_table = dynamodb.Table(os.environ.get("SCORE_TABLE_NAME"))
-
-
 def get_standings_data(event, context):
     team_id = event["team_id"]
     return {"scores": team_scores(team_id)}
 
 
 def store_standings_data(event, context):
+    dynamodb = boto3.resource("dynamodb")
+    scores_table = dynamodb.Table(os.environ.get("SCORE_TABLE_NAME"))
     scores = event["scores"]
     with scores_table.batch_writer() as batch:
         for entry in scores:
