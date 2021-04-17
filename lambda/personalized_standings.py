@@ -1,5 +1,6 @@
 import boto3
 from bs4 import BeautifulSoup
+from datetime import datetime
 from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 import os
@@ -8,7 +9,10 @@ import requests
 
 def get_standings_data(event, context):
     team_id = event["team_id"]
-    scores_dict = {"scores": team_scores(team_id)}
+    scores_dict = {
+        "scores": team_scores(team_id),
+        "timestamp": datetime.now().strftime("%Y%M%d%H%M%S")
+    }
     scores_dict.update(event)
     return scores_dict
 
@@ -19,7 +23,10 @@ def store_standings_data(event, context):
     scores = event["scores"]
     with scores_table.batch_writer() as batch:
         for entry in scores:
-            batch.put_item(Item=entry)
+            entry_to_save = entry.copy()
+            entry_to_save["amount"] = Decimal(entry_to_save["amount"])
+            entry_to_save["timestamp"] = event["timestamp"]
+            batch.put_item(Item=entry_to_save)
     return event
 
 
@@ -33,7 +40,7 @@ def team_url(team_id):
 
 
 def parse_amount(amount_text):
-    return amount_text[1:].replace(",", "")
+    return float(amount_text[1:].replace(",", ""))
 
 
 def team_scores(team_id):
