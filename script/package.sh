@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+set -uxo pipefail
 
 pip install --target build/deps -r requirements.txt
-cd build/deps
+cd build/deps || exit 1
 zip -ur ../package.zip .
-cd ../../lambda
+cd ../../lambda || exit 1
 zip -ur ../build/package.zip .
