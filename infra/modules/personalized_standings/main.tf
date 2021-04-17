@@ -5,6 +5,7 @@ variable "environment" {
 
 locals {
   package_path = "${path.module}/../../../build/package.zip"
+  source_code_hash = filebase64sha256(local.package_path)
 }
 
 resource "aws_iam_role" "iam_for_get_standings_data_lambda" {
@@ -28,6 +29,7 @@ EOF
 
 resource "aws_lambda_function" "get_standings_data_lambda_function" {
   filename = local.package_path
+  source_code_hash = local.source_code_hash
   function_name = "${var.environment}-get-standings-data"
   handler = "personalized_standings.get_standings_data"
   role = aws_iam_role.iam_for_get_standings_data_lambda.arn
@@ -84,6 +86,7 @@ EOF
 
 resource "aws_lambda_function" "store_standings_data_lambda_function" {
   filename = local.package_path
+  source_code_hash = local.source_code_hash
   function_name = "${var.environment}-store-standings-data"
   handler = "personalized_standings.store_standings_data"
   role = aws_iam_role.iam_for_store_standings_data_lambda.arn
@@ -117,6 +120,7 @@ EOF
 
 resource "aws_lambda_function" "personalized_standings_lambda_function" {
   filename = local.package_path
+  source_code_hash = local.source_code_hash
   function_name = "${var.environment}-personalized-standings"
   handler = "personalized_standings.personalized_standings"
   role = aws_iam_role.iam_for_personalized_standings_lambda.arn
