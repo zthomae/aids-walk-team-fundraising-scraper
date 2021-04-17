@@ -100,10 +100,10 @@ resource "aws_iam_role_policy_attachment" "get_standings_data_attachment" {
 resource "aws_dynamodb_table" "standings_table" {
   name = "${var.environment}-aids-walk-team-standings"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "team_id"
+  hash_key = "run_id"
   range_key = "name"
   attribute {
-    name = "team_id"
+    name = "run_id"
     type = "S"
   }
   attribute {

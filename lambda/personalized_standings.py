@@ -8,14 +8,11 @@ import pytz
 import requests
 
 
-timestamp_format = "%Y%m%d%H%M%S"
-
-
 def get_standings_data(event, context):
     team_id = event["team_id"]
     scores_dict = {
         "scores": team_scores(team_id),
-        "timestamp": pytz.utc.localize(datetime.utcnow()).strftime(timestamp_format)
+        "timestamp": datetime.utcnow().isoformat()
     }
     scores_dict.update(event)
     return scores_dict
@@ -25,11 +22,15 @@ def store_standings_data(event, context):
     dynamodb = boto3.resource("dynamodb")
     scores_table = dynamodb.Table(os.environ.get("SCORE_TABLE_NAME"))
     scores = event["scores"]
+    timestamp = event["timestamp"]
+    team_id = event["team_id"]
     with scores_table.batch_writer() as batch:
         for entry in scores:
             entry_to_save = entry.copy()
             entry_to_save["amount"] = Decimal(entry_to_save["amount"])
-            entry_to_save["timestamp"] = event["timestamp"]
+            entry_to_save["timestamp"] = timestamp
+            entry_to_save["team_id"] = team_id
+            entry_to_save["run_id"] = f"{team_id}_{timestamp}"
             batch.put_item(Item=entry_to_save)
     return event
 
@@ -37,7 +38,7 @@ def store_standings_data(event, context):
 def personalized_standings(event, context):
     standings_data = personalized_standings_template_data(event["scores"], event["name"])
     rendered_standings = render_personalized_standings(standings_data, os.environ.get("TEMPLATE_PATH"))
-    utc_datetime = pytz.utc.localize(datetime.strptime(event["timestamp"], timestamp_format))
+    utc_datetime = pytz.utc.localize(datetime.fromisoformat(event["timestamp"]))
     local_datetime = utc_datetime.astimezone(pytz.timezone(os.environ.get("TIMEZONE")))
     friendly_timestamp = local_datetime.strftime("%Y-%m-%d %I:%M %p")
     name = event["name"]
@@ -77,7 +78,7 @@ def team_scores(team_id):
     soup = BeautifulSoup(page_resp.text, "html.parser")
     team_member_table = soup.find(id="tblTeamList")
     team_member_rows = team_member_table.find_all(class_="tableRow")
-    scores = [{"team_id": str(team_id), "name": row.find(class_="tableColName").text, "amount": parse_amount(row.find(class_="tableColRaised").text)}
+    scores = [{"name": row.find(class_="tableColName").text, "amount": parse_amount(row.find(class_="tableColRaised").text)}
               for row in team_member_rows]
     return sorted(scores, key=lambda pair: Decimal(pair["amount"]), reverse=True)
 
