@@ -2,7 +2,7 @@
 <html>
 <body>
 <p>You are currently in {{ place }} place with {{ amount }}.</p>
-<p>Top standings:</p>
+<p>Current top {{ top_standings|length }}:</p>
 <ol>
 {% for standing in top_standings %}
 <li>{{ standing["name"] }}: {{ standing["amount"] }}</li>

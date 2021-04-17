@@ -8,6 +8,21 @@ variable "environment" {
   type = string
 }
 
+variable "local_timezone" {
+  description = "The name of the timezone to localize display times for"
+  type = string
+}
+
+variable "email_sender" {
+  description = "The email address where messages should originate from"
+  type = string
+}
+
+variable "email_recipient" {
+  description = "The email address where messages should be sent"
+  type = string
+}
+
 data "aws_caller_identity" "current" {}
 
 locals {
@@ -169,7 +184,10 @@ resource "aws_lambda_function" "personalized_standings_lambda_function" {
   timeout = 30
   environment {
     variables = {
+      EMAIL_SENDER = var.email_sender
+      EMAIL_RECIPIENT = var.email_recipient
       TEMPLATE_PATH = "templates"
+      TIMEZONE = var.local_timezone
     }
   }
 }
@@ -189,6 +207,21 @@ resource "aws_iam_policy" "personalized_standings_policies" {
         ]
         Effect   = "Allow"
         Resource = "arn:aws:logs:${var.region}:${local.aws_account_id}:*"
+      },
+      {
+        Action = [
+          "ses:SendEmail"
+        ],
+        Effect = "Allow"
+        Condition = {
+          "ForAllValues:StringLike" = {
+            "ses:Recipients" = [var.email_recipient]
+          }
+          StringEquals = {
+            "ses:FromAddress" = var.email_sender
+          }
+        }
+        Resource = "*"
       }
     ]
   })

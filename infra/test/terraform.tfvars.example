@@ -1,2 +1,5 @@
 region = "us-east-2"
 environment = "test"
+email_sender = "foo@example.com"
+email_recipient = "bar@example.com"
+local_timezone = "America/Chicago"

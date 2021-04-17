@@ -4,14 +4,18 @@ from datetime import datetime
 from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 import os
+import pytz
 import requests
+
+
+timestamp_format = "%Y%m%d%H%M%S"
 
 
 def get_standings_data(event, context):
     team_id = event["team_id"]
     scores_dict = {
         "scores": team_scores(team_id),
-        "timestamp": datetime.now().strftime("%Y%M%d%H%M%S")
+        "timestamp": pytz.utc.localize(datetime.utcnow()).strftime(timestamp_format)
     }
     scores_dict.update(event)
     return scores_dict
@@ -32,7 +36,29 @@ def store_standings_data(event, context):
 
 def personalized_standings(event, context):
     standings_data = personalized_standings_template_data(event["scores"], event["name"])
-    return render_personalized_standings(standings_data, os.environ.get("TEMPLATE_PATH"))
+    rendered_standings = render_personalized_standings(standings_data, os.environ.get("TEMPLATE_PATH"))
+    utc_datetime = pytz.utc.localize(datetime.strptime(event["timestamp"], timestamp_format))
+    local_datetime = utc_datetime.astimezone(pytz.timezone(os.environ.get("TIMEZONE")))
+    friendly_timestamp = local_datetime.strftime("%Y-%m-%d %I:%M %p")
+    name = event["name"]
+    ses_client = boto3.client("ses")
+    ses_client.send_email(
+        Source=os.environ.get("EMAIL_SENDER"),
+        Destination={
+            "ToAddresses": [os.environ.get("EMAIL_RECIPIENT")]
+        },
+        Message={
+            "Subject": {
+                "Data": f"AIDS Walk Fundraising Update For {name} - {friendly_timestamp}"
+            },
+            "Body": {
+                "Html": {
+                    "Data": rendered_standings
+                }
+            }
+        }
+    )
+    return event
 
 
 def team_url(team_id):
