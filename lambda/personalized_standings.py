@@ -99,13 +99,15 @@ def format_as_currency(amount):
 
 
 def personalized_standings_template_data(scores, name):
+    total_amount = sum([score["amount"] for score in scores])
     placement = standing_for_name(scores, name)
     top_standings = [{"name": score["name"], "amount": format_as_currency(score["amount"])}
                      for score in scores[:10]]
     return {
         "place": ordinal(placement["place"]),
         "amount": format_as_currency(placement["amount"]),
-        "top_standings": top_standings
+        "top_standings": top_standings,
+        "total_amount": format_as_currency(total_amount)
     }
 
 
