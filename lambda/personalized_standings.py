@@ -12,7 +12,7 @@ def get_standings_data(event, context):
     team_id = event["team_id"]
     scores_dict = {
         "scores": team_scores(team_id),
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
     }
     scores_dict.update(event)
     return scores_dict
@@ -36,8 +36,12 @@ def store_standings_data(event, context):
 
 
 def personalized_standings(event, context):
-    standings_data = personalized_standings_template_data(event["scores"], event["name"])
-    rendered_standings = render_personalized_standings(standings_data, os.environ.get("TEMPLATE_PATH"))
+    standings_data = personalized_standings_template_data(
+        event["scores"], event["name"]
+    )
+    rendered_standings = render_personalized_standings(
+        standings_data, os.environ.get("TEMPLATE_PATH")
+    )
     utc_datetime = pytz.utc.localize(datetime.fromisoformat(event["timestamp"]))
     local_datetime = utc_datetime.astimezone(pytz.timezone(os.environ.get("TIMEZONE")))
     friendly_timestamp = local_datetime.strftime("%Y-%m-%d %I:%M %p")
@@ -45,19 +49,13 @@ def personalized_standings(event, context):
     ses_client = boto3.client("ses")
     ses_client.send_email(
         Source=os.environ.get("EMAIL_SENDER"),
-        Destination={
-            "ToAddresses": [os.environ.get("EMAIL_RECIPIENT")]
-        },
+        Destination={"ToAddresses": [os.environ.get("EMAIL_RECIPIENT")]},
         Message={
             "Subject": {
                 "Data": f"AIDS Walk Fundraising Update For {name} - {friendly_timestamp}"
             },
-            "Body": {
-                "Html": {
-                    "Data": rendered_standings
-                }
-            }
-        }
+            "Body": {"Html": {"Data": rendered_standings}},
+        },
     )
     return event
 
@@ -78,8 +76,13 @@ def team_scores(team_id):
     soup = BeautifulSoup(page_resp.text, "html.parser")
     team_member_table = soup.find(id="tblTeamList")
     team_member_rows = team_member_table.find_all(class_="tableRow")
-    scores = [{"name": row.find(class_="tableColName").text, "amount": parse_amount(row.find(class_="tableColRaised").text)}
-              for row in team_member_rows]
+    scores = [
+        {
+            "name": row.find(class_="tableColName").text,
+            "amount": parse_amount(row.find(class_="tableColRaised").text),
+        }
+        for row in team_member_rows
+    ]
     return sorted(scores, key=lambda pair: Decimal(pair["amount"]), reverse=True)
 
 
@@ -92,7 +95,7 @@ def standing_for_name(scores, name):
 
 # Credit: https://stackoverflow.com/a/20007730
 def ordinal(n):
-    return "%d%s" % (n, "tsnrhtdd"[(n // 10 % 10 != 1) * (n % 10 < 4) * n % 10::4])
+    return "%d%s" % (n, "tsnrhtdd"[(n // 10 % 10 != 1) * (n % 10 < 4) * n % 10 :: 4])
 
 
 def format_as_currency(amount):
@@ -102,13 +105,15 @@ def format_as_currency(amount):
 def personalized_standings_template_data(scores, name):
     total_amount = sum([score["amount"] for score in scores])
     placement = standing_for_name(scores, name)
-    top_standings = [{"name": score["name"], "amount": format_as_currency(score["amount"])}
-                     for score in scores[:10]]
+    top_standings = [
+        {"name": score["name"], "amount": format_as_currency(score["amount"])}
+        for score in scores[:10]
+    ]
     return {
         "place": ordinal(placement["place"]),
         "amount": format_as_currency(placement["amount"]),
         "top_standings": top_standings,
-        "total_amount": format_as_currency(total_amount)
+        "total_amount": format_as_currency(total_amount),
     }
 
 
