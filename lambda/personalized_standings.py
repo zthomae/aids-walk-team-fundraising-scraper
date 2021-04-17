@@ -1,12 +1,24 @@
+import boto3
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
 import os
 import requests
 
 
+dynamodb = boto3.resource("dynamodb")
+scores_table = dynamodb.Table(os.environ.get("SCORE_TABLE_NAME"))
+
+
 def get_standings_data(event, context):
     team_id = event["team_id"]
     return {"scores": team_scores(team_id)}
+
+
+def store_standings_data(event, context):
+    scores = event["scores"]
+    with scores_table.batch_writer() as batch:
+        for entry in scores:
+            batch.put_item(Item=entry)
 
 
 def personalized_standings(event, context):
@@ -30,7 +42,7 @@ def team_scores(team_id):
     soup = BeautifulSoup(page_resp.text, "html.parser")
     team_member_table = soup.find(id="tblTeamList")
     team_member_rows = team_member_table.find_all(class_="tableRow")
-    scores = [{"name": row.find(class_="tableColName").text, "amount": parse_amount(row.find(class_="tableColRaised").text)}
+    scores = [{"team_id": str(team_id), "name": row.find(class_="tableColName").text, "amount": parse_amount(row.find(class_="tableColRaised").text)}
               for row in team_member_rows]
     return sorted(scores, key=lambda pair: pair["amount"], reverse=True)
 
