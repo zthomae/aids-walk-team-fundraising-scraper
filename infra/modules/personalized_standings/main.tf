@@ -10,21 +10,18 @@ locals {
 
 resource "aws_iam_role" "iam_for_get_standings_data_lambda" {
   name = "iam_for_get_standings_data_lambda"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Effect = "Allow"
+      }
+    ]
+  })
 }
 
 resource "aws_lambda_function" "get_standings_data_lambda_function" {
@@ -54,21 +51,18 @@ resource "aws_dynamodb_table" "standings_table" {
 
 resource "aws_iam_role" "iam_for_store_standings_data_lambda" {
   name = "iam_for_store_standings_data_lambda"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Effect = "Allow"
+      }
+    ]
+  })
   inline_policy {
     name = "dynamo-write"
     policy = jsonencode({
@@ -101,21 +95,18 @@ resource "aws_lambda_function" "store_standings_data_lambda_function" {
 
 resource "aws_iam_role" "iam_for_personalized_standings_lambda" {
   name = "iam_for_personalized_standings_lambda"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+        Effect = "Allow"
+      }
+    ]
+  })
 }
 
 resource "aws_lambda_function" "personalized_standings_lambda_function" {
@@ -126,4 +117,70 @@ resource "aws_lambda_function" "personalized_standings_lambda_function" {
   role = aws_iam_role.iam_for_personalized_standings_lambda.arn
   runtime = "python3.8"
   timeout = 30
+  environment {
+    variables = {
+      TEMPLATE_PATH = "templates"
+    }
+  }
+}
+
+resource "aws_iam_role" "iam_for_update_personalized_standings_state_machine" {
+  name = "iam_for_update_personalized_standings_state_machine"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "states.amazonaws.com"
+        }
+        Effect = "Allow"
+      }
+    ]
+  })
+  inline_policy {
+    name = "StatesExecutionPolicy"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Action = [
+            "lambda:InvokeFunction"
+          ]
+          Effect = "Allow"
+          Resource = [
+            aws_lambda_function.get_standings_data_lambda_function.arn,
+            aws_lambda_function.store_standings_data_lambda_function.arn,
+            aws_lambda_function.personalized_standings_lambda_function.arn
+          ]
+        }
+      ]
+    })
+  }
+}
+
+resource "aws_sfn_state_machine" "update_personalized_standings_state_machine" {
+  name = "${var.environment}-update-personalized-standings"
+  role_arn = aws_iam_role.iam_for_update_personalized_standings_state_machine.arn
+  definition = jsonencode({
+    Comment = "Updates and returns personalized standings information for a given team/participant"
+    StartAt = "GetStandingsData"
+    States = {
+      GetStandingsData = {
+        Type = "Task"
+        Resource = aws_lambda_function.get_standings_data_lambda_function.arn
+        Next = "StoreStandingsData"
+      }
+      StoreStandingsData = {
+        Type = "Task"
+        Resource = aws_lambda_function.store_standings_data_lambda_function.arn
+        Next = "GetPersonalizedStandingsData"
+      }
+      GetPersonalizedStandingsData = {
+        Type = "Task"
+        Resource = aws_lambda_function.personalized_standings_lambda_function.arn
+        End = true
+      }
+    }
+  })
 }
