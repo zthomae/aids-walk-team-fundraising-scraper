@@ -1,5 +1,6 @@
 import boto3
 from bs4 import BeautifulSoup
+from decimal import Decimal
 from jinja2 import Environment, FileSystemLoader
 import os
 import requests
@@ -7,7 +8,9 @@ import requests
 
 def get_standings_data(event, context):
     team_id = event["team_id"]
-    return {"scores": team_scores(team_id)}
+    scores_dict = {"scores": team_scores(team_id)}
+    scores_dict.update(event)
+    return scores_dict
 
 
 def store_standings_data(event, context):
@@ -17,6 +20,7 @@ def store_standings_data(event, context):
     with scores_table.batch_writer() as batch:
         for entry in scores:
             batch.put_item(Item=entry)
+    return event
 
 
 def personalized_standings(event, context):
@@ -29,7 +33,7 @@ def team_url(team_id):
 
 
 def parse_amount(amount_text):
-    return float(amount_text[1:].replace(",", ""))
+    return amount_text[1:].replace(",", "")
 
 
 def team_scores(team_id):
@@ -42,7 +46,7 @@ def team_scores(team_id):
     team_member_rows = team_member_table.find_all(class_="tableRow")
     scores = [{"team_id": str(team_id), "name": row.find(class_="tableColName").text, "amount": parse_amount(row.find(class_="tableColRaised").text)}
               for row in team_member_rows]
-    return sorted(scores, key=lambda pair: pair["amount"], reverse=True)
+    return sorted(scores, key=lambda pair: Decimal(pair["amount"]), reverse=True)
 
 
 def standing_for_name(scores, name):
@@ -58,7 +62,7 @@ def ordinal(n):
 
 
 def format_as_currency(amount):
-    return "${:,.2f}".format(amount)
+    return "${:,.2f}".format(Decimal(amount))
 
 
 def personalized_standings_template_data(scores, name):
