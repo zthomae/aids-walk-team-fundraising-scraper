@@ -15,6 +15,21 @@ variable "local_timezone" {
   default = "America/Chicago"
 }
 
+variable "team_id" {
+  description = "The ID of the fundraising team"
+  type = string
+}
+
+variable "name_for_personalization" {
+  description = "The name of the person to base personalized standings on"
+  type = string
+}
+
+variable "enable_scheduled_personalization_email" {
+  description = "Will automatically schedule a personalization email if true"
+  type = bool
+}
+
 variable "email_sender" {
   description = "The email address where messages should originate from"
   type = string
@@ -34,6 +49,9 @@ module "personalized_standings" {
   environment = var.environment
   region = var.region
   local_timezone = var.local_timezone
+  team_id = var.team_id
+  name_for_personalization = var.name_for_personalization
+  enable_scheduled_personalization_email = var.enable_scheduled_personalization_email
   email_sender = var.email_sender
   email_recipient = var.email_recipient
 }

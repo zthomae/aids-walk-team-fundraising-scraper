@@ -1,5 +1,8 @@
 region = "us-east-2"
 environment = "test"
+team_id = "12345"
+name_for_personalization = "Foo Bar"
+enable_scheduled_personalization_email = false
 email_sender = "foo@example.com"
 email_recipient = "bar@example.com"
 local_timezone = "America/Chicago"

@@ -13,6 +13,21 @@ variable "local_timezone" {
   type = string
 }
 
+variable "team_id" {
+  description = "The ID of the fundraising team"
+  type = string
+}
+
+variable "name_for_personalization" {
+  description = "The name of the person to base personalized standings on"
+  type = string
+}
+
+variable "enable_scheduled_personalization_email" {
+  description = "Will automatically schedule a personalization email if true"
+  type = bool
+}
+
 variable "email_sender" {
   description = "The email address where messages should originate from"
   type = string
@@ -290,5 +305,56 @@ resource "aws_sfn_state_machine" "update_personalized_standings_state_machine" {
         End = true
       }
     }
+  })
+}
+
+resource "aws_iam_role" "iam_for_update_personalized_standings_event_target" {
+  name = "iam_for_update_personalized_standings_event_target"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+        Effect = "Allow"
+      }
+    ]
+  })
+  inline_policy {
+    name = "StateMachineExecutionPolicy"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Action = [
+            "states:StartExecution"
+          ]
+          Effect = "Allow"
+          Resource = [
+            aws_sfn_state_machine.update_personalized_standings_state_machine.arn
+          ]
+        }
+      ]
+    })
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "scheduled_personalized_standings_update" {
+  name = "${var.environment}-scheduled-personalized-standings-update"
+  description = "Scheduled event for sending a personalized standings update on fundraising"
+  schedule_expression = "cron(0 13,21 * * ? *)"
+  is_enabled = var.enable_scheduled_personalization_email
+}
+
+resource "aws_cloudwatch_event_target" "target_state_machine" {
+  rule = aws_cloudwatch_event_rule.scheduled_personalized_standings_update.name
+  target_id = "StartStateMachine"
+  arn = aws_sfn_state_machine.update_personalized_standings_state_machine.arn
+  role_arn = aws_iam_role.iam_for_update_personalized_standings_event_target.arn
+  input = jsonencode({
+    team_id = var.team_id
+    name = var.name_for_personalization
   })
 }
