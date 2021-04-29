@@ -1,7 +1,10 @@
 beautifulsoup4~=4.9.3
 black~=20.8b1
 boto3~=1.17.52
+freezegun~=1.1.0
 Jinja2~=2.11.3
 pytest~=6.2.3
+pytest-snapshot~=0.6.1
 pytz~=2021.1
 requests~=2.25.1
+requests-mock~=1.8.0
