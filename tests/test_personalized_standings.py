@@ -80,3 +80,31 @@ def test_store_standings_data(mocker, dynamodb):
         sorted(entries, key=lambda entry: entry["run_id"]["S"])
 
     assert order_entries(expected_entries) == order_entries(item_response["Items"])
+
+
+def test_personalized_standings(mocker, ses):
+    event = {
+        "team_id": "1234",
+        "timestamp": datetime(2021, 1, 14, 13, 57).isoformat(),
+        "scores": [
+            {"amount": 127.50, "name": "First Person"},
+            {"amount": 56.25, "name": "Second Person"},
+            {"amount": 5634.05, "name": "Third Person"},
+        ],
+        "name": "Third Person",
+    }
+    email_sender = "hi@example.com"
+    email_recipient = "bob@example.com"
+    ses.verify_email_address(EmailAddress=email_sender)
+    ses.verify_email_address(EmailAddress=email_recipient)
+    mocker.patch.dict(
+        "os.environ",
+        {
+            "EMAIL_SENDER": email_sender,
+            "EMAIL_RECIPIENT": email_recipient,
+            "TEMPLATE_PATH": "src/handlers/templates",
+            "TIMEZONE": "America/Chicago",
+        },
+    )
+    ses_response = personalized_standings(event, None)
+    assert ses_response == event
