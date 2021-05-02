@@ -36,7 +36,21 @@ def test_get_standings_data(event, minimal_team_page, snapshot):
     )
 
 
-def test_store_standings_data(mocker, dynamodb):
+@pytest.fixture()
+def event_with_scores():
+    return {
+        "team_id": "1234",
+        "timestamp": datetime(2021, 1, 14, 13, 57).isoformat(),
+        "scores": [
+            {"amount": Decimal("127.50"), "name": "First Person"},
+            {"amount": Decimal("56.25"), "name": "Second Person"},
+            {"amount": Decimal("5634.05"), "name": "Third Person"},
+        ],
+        "name": "Third Person",
+    }
+
+
+def test_store_standings_data(mocker, dynamodb, event_with_scores):
     score_table_name = "test_table"
     dynamodb.create_table(
         TableName=score_table_name,
@@ -53,26 +67,19 @@ def test_store_standings_data(mocker, dynamodb):
         "os.environ",
         {"SCORE_TABLE_NAME": score_table_name},
     )
-    event = {
-        "team_id": "1234",
-        "timestamp": datetime(2021, 1, 14, 13, 57).isoformat(),
-        "scores": [
-            {"amount": Decimal("127.50"), "name": "First Person"},
-            {"amount": Decimal("56.25"), "name": "Second Person"},
-            {"amount": Decimal("5634.05"), "name": "Third Person"},
-        ],
-    }
     expected_entries = [
         {
             "amount": {"N": score["amount"]},
             "name": {"S": score["name"]},
-            "timestamp": {"S": event["timestamp"]},
-            "team_id": {"S": event["team_id"]},
-            "run_id": {"S": f"{event['team_id']}_{event['timestamp']}"},
+            "timestamp": {"S": event_with_scores["timestamp"]},
+            "team_id": {"S": event_with_scores["team_id"]},
+            "run_id": {
+                "S": f"{event_with_scores['team_id']}_{event_with_scores['timestamp']}"
+            },
         }
-        for score in event["scores"]
+        for score in event_with_scores["scores"]
     ]
-    assert store_standings_data(event, None) == event
+    assert store_standings_data(event_with_scores, None) == event_with_scores
 
     item_response = dynamodb.scan(TableName=score_table_name)
 
@@ -82,17 +89,7 @@ def test_store_standings_data(mocker, dynamodb):
     assert order_entries(expected_entries) == order_entries(item_response["Items"])
 
 
-def test_personalized_standings(mocker, ses):
-    event = {
-        "team_id": "1234",
-        "timestamp": datetime(2021, 1, 14, 13, 57).isoformat(),
-        "scores": [
-            {"amount": Decimal("127.50"), "name": "First Person"},
-            {"amount": Decimal("56.25"), "name": "Second Person"},
-            {"amount": Decimal("5634.05"), "name": "Third Person"},
-        ],
-        "name": "Third Person",
-    }
+def test_personalized_standings(mocker, ses, event_with_scores):
     email_sender = "hi@example.com"
     email_recipient = "bob@example.com"
     ses.verify_email_address(EmailAddress=email_sender)
@@ -106,5 +103,5 @@ def test_personalized_standings(mocker, ses):
             "TIMEZONE": "America/Chicago",
         },
     )
-    ses_response = personalized_standings(event, None)
-    assert ses_response == event
+    ses_response = personalized_standings(event_with_scores, None)
+    assert ses_response == event_with_scores
