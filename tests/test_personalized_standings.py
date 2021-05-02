@@ -31,7 +31,7 @@ def minimal_team_page(event, requests_mock):
 def test_get_standings_data(event, minimal_team_page, snapshot):
     team_id = event["team_id"]
     snapshot.assert_match(
-        json.dumps(get_standings_data(event, None)),
+        json.dumps(get_standings_data(event, None), indent=4),
         f"get_standings_data_minimal_team_{team_id}.json",
     )
 
@@ -141,7 +141,7 @@ def test_personalized_standings(mocker, ses, event_with_scores):
 def test_rendering_event_data(large_sorted_scores, person, snapshot):
     standings_data = personalized_standings_template_data(large_sorted_scores, person)
     snapshot.assert_match(
-        json.dumps(standings_data),
+        json.dumps(standings_data, indent=4),
         f"rendering_test_standings_data.json",
     )
     snapshot.assert_match(

@@ -1,1 +1,211 @@
-{"scores": [{"name": "Tayyib Khan", "amount": 1850.0}, {"name": "Hafsah Summers", "amount": 1270.0}, {"name": "Enya Fountain", "amount": 870.0}, {"name": "Naomi Pitts", "amount": 850.0}, {"name": "Aria Gibbons", "amount": 675.0}, {"name": "Fox Miles", "amount": 520.0}, {"name": "Leigh Hughes", "amount": 370.0}, {"name": "Tahmina Haney", "amount": 300.0}, {"name": "Lester Thompson", "amount": 300.0}, {"name": "Denise Holder", "amount": 300.0}, {"name": "Blair Parra", "amount": 250.0}, {"name": "Anabel Mccall", "amount": 233.0}, {"name": "Evie-Mae Conley", "amount": 220.0}, {"name": "Kelsi Friedman", "amount": 200.0}, {"name": "Alastair Cowan", "amount": 170.0}, {"name": "Hallie Tran", "amount": 150.0}, {"name": "Indigo Skinner", "amount": 150.0}, {"name": "Olli Browne", "amount": 145.0}, {"name": "Desiree Sparrow", "amount": 125.0}, {"name": "Mckenzie Rogers", "amount": 125.0}, {"name": "Siana Gay", "amount": 120.0}, {"name": "Dominique Mcarthur", "amount": 100.0}, {"name": "Kwabena Burch", "amount": 100.0}, {"name": "Cleveland Small", "amount": 100.0}, {"name": "Wilf Thomson", "amount": 100.0}, {"name": "Abigail Terry", "amount": 50.0}, {"name": "Lily-May Ewing", "amount": 50.0}, {"name": "Willem Cases", "amount": 50.0}, {"name": "Sayed Petty", "amount": 50.0}, {"name": "Lilli Woodcock", "amount": 50.0}, {"name": "Jermaine Zimmerman", "amount": 50.0}, {"name": "Cecilia Sweet", "amount": 35.0}, {"name": "Christine Webb", "amount": 30.0}, {"name": "Adeel Adkins", "amount": 25.0}, {"name": "Jonathon Barnes", "amount": 25.0}, {"name": "Jill Frey", "amount": 25.0}, {"name": "Chantelle Sharples", "amount": 5.0}, {"name": "Britney Cassidy", "amount": 0.0}, {"name": "Callum Michael", "amount": 0.0}, {"name": "Jaxx Pemberton", "amount": 0.0}, {"name": "Dylan Lara", "amount": 0.0}, {"name": "Eira Parks", "amount": 0.0}, {"name": "Anisa Albert", "amount": 0.0}, {"name": "Madiha Ventura", "amount": 0.0}, {"name": "Ava-Mai Bradford", "amount": 0.0}, {"name": "Beatrix Robbins", "amount": 0.0}, {"name": "Usamah Carr", "amount": 0.0}, {"name": "Andrea Snyder", "amount": 0.0}, {"name": "Ammaarah Byrne", "amount": 0.0}, {"name": "Whitney Contreras", "amount": 0.0}, {"name": "Shah Mcdermott", "amount": 0.0}], "timestamp": "2021-03-14T15:30:01", "team_id": "456", "foo": "bar"}
+{
+    "scores": [
+        {
+            "name": "Tayyib Khan",
+            "amount": 1850.0
+        },
+        {
+            "name": "Hafsah Summers",
+            "amount": 1270.0
+        },
+        {
+            "name": "Enya Fountain",
+            "amount": 870.0
+        },
+        {
+            "name": "Naomi Pitts",
+            "amount": 850.0
+        },
+        {
+            "name": "Aria Gibbons",
+            "amount": 675.0
+        },
+        {
+            "name": "Fox Miles",
+            "amount": 520.0
+        },
+        {
+            "name": "Leigh Hughes",
+            "amount": 370.0
+        },
+        {
+            "name": "Tahmina Haney",
+            "amount": 300.0
+        },
+        {
+            "name": "Lester Thompson",
+            "amount": 300.0
+        },
+        {
+            "name": "Denise Holder",
+            "amount": 300.0
+        },
+        {
+            "name": "Blair Parra",
+            "amount": 250.0
+        },
+        {
+            "name": "Anabel Mccall",
+            "amount": 233.0
+        },
+        {
+            "name": "Evie-Mae Conley",
+            "amount": 220.0
+        },
+        {
+            "name": "Kelsi Friedman",
+            "amount": 200.0
+        },
+        {
+            "name": "Alastair Cowan",
+            "amount": 170.0
+        },
+        {
+            "name": "Hallie Tran",
+            "amount": 150.0
+        },
+        {
+            "name": "Indigo Skinner",
+            "amount": 150.0
+        },
+        {
+            "name": "Olli Browne",
+            "amount": 145.0
+        },
+        {
+            "name": "Desiree Sparrow",
+            "amount": 125.0
+        },
+        {
+            "name": "Mckenzie Rogers",
+            "amount": 125.0
+        },
+        {
+            "name": "Siana Gay",
+            "amount": 120.0
+        },
+        {
+            "name": "Dominique Mcarthur",
+            "amount": 100.0
+        },
+        {
+            "name": "Kwabena Burch",
+            "amount": 100.0
+        },
+        {
+            "name": "Cleveland Small",
+            "amount": 100.0
+        },
+        {
+            "name": "Wilf Thomson",
+            "amount": 100.0
+        },
+        {
+            "name": "Abigail Terry",
+            "amount": 50.0
+        },
+        {
+            "name": "Lily-May Ewing",
+            "amount": 50.0
+        },
+        {
+            "name": "Willem Cases",
+            "amount": 50.0
+        },
+        {
+            "name": "Sayed Petty",
+            "amount": 50.0
+        },
+        {
+            "name": "Lilli Woodcock",
+            "amount": 50.0
+        },
+        {
+            "name": "Jermaine Zimmerman",
+            "amount": 50.0
+        },
+        {
+            "name": "Cecilia Sweet",
+            "amount": 35.0
+        },
+        {
+            "name": "Christine Webb",
+            "amount": 30.0
+        },
+        {
+            "name": "Adeel Adkins",
+            "amount": 25.0
+        },
+        {
+            "name": "Jonathon Barnes",
+            "amount": 25.0
+        },
+        {
+            "name": "Jill Frey",
+            "amount": 25.0
+        },
+        {
+            "name": "Chantelle Sharples",
+            "amount": 5.0
+        },
+        {
+            "name": "Britney Cassidy",
+            "amount": 0.0
+        },
+        {
+            "name": "Callum Michael",
+            "amount": 0.0
+        },
+        {
+            "name": "Jaxx Pemberton",
+            "amount": 0.0
+        },
+        {
+            "name": "Dylan Lara",
+            "amount": 0.0
+        },
+        {
+            "name": "Eira Parks",
+            "amount": 0.0
+        },
+        {
+            "name": "Anisa Albert",
+            "amount": 0.0
+        },
+        {
+            "name": "Madiha Ventura",
+            "amount": 0.0
+        },
+        {
+            "name": "Ava-Mai Bradford",
+            "amount": 0.0
+        },
+        {
+            "name": "Beatrix Robbins",
+            "amount": 0.0
+        },
+        {
+            "name": "Usamah Carr",
+            "amount": 0.0
+        },
+        {
+            "name": "Andrea Snyder",
+            "amount": 0.0
+        },
+        {
+            "name": "Ammaarah Byrne",
+            "amount": 0.0
+        },
+        {
+            "name": "Whitney Contreras",
+            "amount": 0.0
+        },
+        {
+            "name": "Shah Mcdermott",
+            "amount": 0.0
+        }
+    ],
+    "timestamp": "2021-03-14T15:30:01",
+    "team_id": "456",
+    "foo": "bar"
+}
