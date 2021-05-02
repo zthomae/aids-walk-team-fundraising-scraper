@@ -1,0 +1,25 @@
+name: terraform
+
+on: [push]
+
+jobs:
+  validate_test:
+    name: Validate test infra
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build handler package
+      run: script/package.sh
+    - uses: dflook/terraform-validate@v1
+      with:
+        path: infra/test
+  validate_prod:
+    name: Validate prod infra
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build handler package
+      run: script/package.sh
+    - uses: dflook/terraform-validate@v1
+      with:
+        path: infra/prod
