@@ -50,6 +50,27 @@ def event_with_scores():
     }
 
 
+@pytest.fixture()
+def large_sorted_scores():
+    return [
+        {"amount": Decimal("1500.00"), "name": "First Person"},
+        {"amount": Decimal("1400.00"), "name": "Second Person"},
+        {"amount": Decimal("1300.00"), "name": "Third Person"},
+        {"amount": Decimal("1200.00"), "name": "Fourth Person"},
+        {"amount": Decimal("1100.00"), "name": "Fifth Person"},
+        {"amount": Decimal("1000.00"), "name": "Sixth Person"},
+        {"amount": Decimal("900.00"), "name": "Seventh Person"},
+        {"amount": Decimal("800.00"), "name": "Eighth Person"},
+        {"amount": Decimal("700.00"), "name": "Ninth Person"},
+        {"amount": Decimal("600.00"), "name": "Tenth Person"},
+        {"amount": Decimal("500.00"), "name": "Eleventh Person"},
+        {"amount": Decimal("400.00"), "name": "Twelfth Person"},
+        {"amount": Decimal("300.00"), "name": "Thirteenth Person"},
+        {"amount": Decimal("200.00"), "name": "Fourteenth Person"},
+        {"amount": Decimal("100.00"), "name": "Fifteenth Person"},
+    ]
+
+
 def test_store_standings_data(mocker, dynamodb, event_with_scores):
     score_table_name = "test_table"
     dynamodb.create_table(
@@ -105,3 +126,25 @@ def test_personalized_standings(mocker, ses, event_with_scores):
     )
     ses_response = personalized_standings(event_with_scores, None)
     assert ses_response == event_with_scores
+
+
+@pytest.mark.parametrize(
+    "person",
+    [
+        "First Person",
+        "Third Person",
+        "Tenth Person",
+        "Eleventh Person",
+        "Thirteenth Person",
+    ],
+)
+def test_rendering_event_data(large_sorted_scores, person, snapshot):
+    standings_data = personalized_standings_template_data(large_sorted_scores, person)
+    snapshot.assert_match(
+        json.dumps(standings_data),
+        f"rendering_test_standings_data.json",
+    )
+    snapshot.assert_match(
+        render_personalized_standings(standings_data, "src/handlers/templates"),
+        f"rendering_test_email_body.html",
+    )
