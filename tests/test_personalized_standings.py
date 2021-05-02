@@ -57,9 +57,9 @@ def test_store_standings_data(mocker, dynamodb):
         "team_id": "1234",
         "timestamp": datetime(2021, 1, 14, 13, 57).isoformat(),
         "scores": [
-            {"amount": "127.50", "name": "First Person"},
-            {"amount": "56.25", "name": "Second Person"},
-            {"amount": "5634.05", "name": "Third Person"},
+            {"amount": Decimal("127.50"), "name": "First Person"},
+            {"amount": Decimal("56.25"), "name": "Second Person"},
+            {"amount": Decimal("5634.05"), "name": "Third Person"},
         ],
     }
     expected_entries = [
@@ -87,9 +87,9 @@ def test_personalized_standings(mocker, ses):
         "team_id": "1234",
         "timestamp": datetime(2021, 1, 14, 13, 57).isoformat(),
         "scores": [
-            {"amount": 127.50, "name": "First Person"},
-            {"amount": 56.25, "name": "Second Person"},
-            {"amount": 5634.05, "name": "Third Person"},
+            {"amount": Decimal("127.50"), "name": "First Person"},
+            {"amount": Decimal("56.25"), "name": "Second Person"},
+            {"amount": Decimal("5634.05"), "name": "Third Person"},
         ],
         "name": "Third Person",
     }
