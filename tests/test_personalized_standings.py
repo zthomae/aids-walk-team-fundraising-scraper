@@ -71,7 +71,7 @@ def large_sorted_scores():
     ]
 
 
-def test_store_standings_data(mocker, dynamodb, event_with_scores):
+def test_store_standings_data(monkeypatch, dynamodb, event_with_scores):
     score_table_name = "test_table"
     dynamodb.create_table(
         TableName=score_table_name,
@@ -84,10 +84,7 @@ def test_store_standings_data(mocker, dynamodb, event_with_scores):
             {"AttributeName": "name", "AttributeType": "S"},
         ],
     )
-    mocker.patch.dict(
-        "os.environ",
-        {"SCORE_TABLE_NAME": score_table_name},
-    )
+    monkeypatch.setenv("SCORE_TABLE_NAME", score_table_name)
     expected_entries = [
         {
             "amount": {"N": score["amount"]},
@@ -110,20 +107,15 @@ def test_store_standings_data(mocker, dynamodb, event_with_scores):
     assert order_entries(expected_entries) == order_entries(item_response["Items"])
 
 
-def test_personalized_standings(mocker, ses, event_with_scores):
+def test_personalized_standings(monkeypatch, ses, event_with_scores):
     email_sender = "hi@example.com"
     email_recipient = "bob@example.com"
     ses.verify_email_address(EmailAddress=email_sender)
     ses.verify_email_address(EmailAddress=email_recipient)
-    mocker.patch.dict(
-        "os.environ",
-        {
-            "EMAIL_SENDER": email_sender,
-            "EMAIL_RECIPIENT": email_recipient,
-            "TEMPLATE_PATH": "src/handlers/templates",
-            "TIMEZONE": "America/Chicago",
-        },
-    )
+    monkeypatch.setenv("EMAIL_SENDER", email_sender)
+    monkeypatch.setenv("EMAIL_RECIPIENT", email_recipient)
+    monkeypatch.setenv("TEMPLATE_PATH", "src/handlers/templates")
+    monkeypatch.setenv("TIMEZONE", "America/Chicago")
     ses_response = personalized_standings(event_with_scores, None)
     assert ses_response == event_with_scores
 
