@@ -42,7 +42,7 @@ This project is largely divided into four top-level directories:
 ### Requirements
 
 - Python 3.8
-- Terraform 0.15.0 (specified in [`.terraform-version`](.terraform-version) for use with [tfenv](https://github.com/tfutils/tfenv#terraform-version-file))
+- Terraform 0.15.3 (specified in [`.terraform-version`](.terraform-version) for use with [tfenv](https://github.com/tfutils/tfenv#terraform-version-file))
 
 ### Command Overview
 
