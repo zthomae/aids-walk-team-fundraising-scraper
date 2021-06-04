@@ -27,7 +27,7 @@ def store_standings_data(event, context):
     with scores_table.batch_writer() as batch:
         for entry in scores:
             entry_to_save = entry.copy()
-            entry_to_save["amount"] = Decimal(entry_to_save["amount"])
+            entry_to_save["amount"] = Decimal(str(entry_to_save["amount"]))
             entry_to_save["timestamp"] = timestamp
             entry_to_save["team_id"] = team_id
             entry_to_save["run_id"] = f"{team_id}_{timestamp}"
