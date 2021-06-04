@@ -10,8 +10,10 @@ import requests
 
 def get_standings_data(event, context):
     team_id = event["team_id"]
+    team_score_data = team_scores(team_id)
     scores_dict = {
-        "scores": team_scores(team_id),
+        "scores": team_score_data["scores"],
+        "total": team_score_data["total"],
         "timestamp": datetime.utcnow().isoformat(),
     }
     scores_dict.update(event)
@@ -37,7 +39,7 @@ def store_standings_data(event, context):
 
 def personalized_standings(event, context):
     standings_data = personalized_standings_template_data(
-        event["scores"], event["name"]
+        event["scores"], event["name"], event["total"]
     )
     rendered_standings = render_personalized_standings(
         standings_data, os.environ.get("TEMPLATE_PATH")
@@ -83,7 +85,12 @@ def team_scores(team_id):
         }
         for row in team_member_rows
     ]
-    return sorted(scores, key=lambda pair: Decimal(pair["amount"]), reverse=True)
+    sorted_scores = sorted(scores, key=lambda pair: Decimal(pair["amount"]), reverse=True)
+    total = parse_amount(soup.find(id="NewProgressAmtRaised").find(class_="was-raised").text)
+    return {
+        "scores": sorted_scores,
+        "total": total,
+    }
 
 
 def standing_for_name(scores, name):
@@ -102,8 +109,7 @@ def format_as_currency(amount):
     return "${:,.2f}".format(Decimal(amount))
 
 
-def personalized_standings_template_data(scores, name):
-    total_amount = sum([score["amount"] for score in scores])
+def personalized_standings_template_data(scores, name, total_amount):
     placement = standing_for_name(scores, name)
     top_standings = [
         {"name": score["name"], "amount": format_as_currency(score["amount"])}

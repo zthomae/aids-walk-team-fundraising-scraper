@@ -46,6 +46,7 @@ def event_with_scores():
             {"amount": Decimal("56.25"), "name": "Second Person"},
             {"amount": Decimal("5634.05"), "name": "Third Person"},
         ],
+        "total": Decimal("5817.80"),
         "name": "Third Person",
     }
 
@@ -131,7 +132,8 @@ def test_personalized_standings(monkeypatch, ses, event_with_scores):
     ],
 )
 def test_rendering_event_data(large_sorted_scores, person, snapshot):
-    standings_data = personalized_standings_template_data(large_sorted_scores, person)
+    total = sum(score["amount"] for score in large_sorted_scores)
+    standings_data = personalized_standings_template_data(large_sorted_scores, person, total)
     snapshot.assert_match(
         json.dumps(standings_data, indent=4),
         f"rendering_test_standings_data.json",
